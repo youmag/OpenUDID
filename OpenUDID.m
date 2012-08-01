@@ -167,6 +167,9 @@ static int const kOpenUDIDRedundancySlots = 100;
     return [OpenUDID valueWithError:nil];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wselector"
+
 + (NSString*) valueWithError:(NSError **)error {
 
     if (kOpenUDIDSessionCache!=nil) {
@@ -203,9 +206,9 @@ static int const kOpenUDIDRedundancySlots = 100;
     id localDict = [defaults objectForKey:kOpenUDIDKey];
     if ([localDict isKindOfClass:[NSDictionary class]]) {
         localDict = [NSMutableDictionary dictionaryWithDictionary:localDict]; // we might need to set/overwrite the redundancy slot
-        openUDID = [localDict objectForKey:kOpenUDIDKey];
-        myRedundancySlotPBid = [localDict objectForKey:kOpenUDIDSlotKey];
-        optedOutDate = [localDict objectForKey:kOpenUDIDOOTSKey];
+        openUDID = [(NSMutableDictionary*)localDict objectForKey:kOpenUDIDKey];
+        myRedundancySlotPBid = [(NSMutableDictionary*)localDict objectForKey:kOpenUDIDSlotKey];
+        optedOutDate = [(NSMutableDictionary*)localDict objectForKey:kOpenUDIDOOTSKey];
         optedOut = optedOutDate!=nil;
         OpenUDIDLog(@"localDict = %@",localDict);
     }
@@ -276,10 +279,10 @@ static int const kOpenUDIDRedundancySlots = 100;
         //
         if (localDict==nil) { 
             localDict = [NSMutableDictionary dictionaryWithCapacity:4];
-            [localDict setObject:openUDID forKey:kOpenUDIDKey];
-            [localDict setObject:appUID forKey:kOpenUDIDAppUIDKey];
-            [localDict setObject:[NSDate date] forKey:kOpenUDIDTSKey];
-            if (optedOut) [localDict setObject:optedOutDate forKey:kOpenUDIDTSKey];
+            [(NSMutableDictionary*)localDict setObject:openUDID forKey:kOpenUDIDKey];
+            [(NSMutableDictionary*)localDict setObject:appUID forKey:kOpenUDIDAppUIDKey];
+            [(NSMutableDictionary*)localDict setObject:[NSDate date] forKey:kOpenUDIDTSKey];
+            if (optedOut) [(NSMutableDictionary*)localDict setObject:optedOutDate forKey:kOpenUDIDTSKey];
             saveLocalDictToDefaults = YES;
         }
     }
@@ -304,7 +307,7 @@ static int const kOpenUDIDRedundancySlots = 100;
         // save slotPBid to the defaults, and remember to save later
         //
         if (localDict) {
-            [localDict setObject:availableSlotPBid forKey:kOpenUDIDSlotKey];
+            [(NSMutableDictionary*)localDict setObject:availableSlotPBid forKey:kOpenUDIDSlotKey];
             saveLocalDictToDefaults = YES;
         }
         
@@ -349,6 +352,8 @@ static int const kOpenUDIDRedundancySlots = 100;
     return kOpenUDIDSessionCache;
 }
 
+#pragma clang diagnostic pop
+
 + (void) setOptOut:(BOOL)optOutValue {
 
     // init call
@@ -366,9 +371,9 @@ static int const kOpenUDIDRedundancySlots = 100;
 
     // set the opt-out date or remove key, according to parameter
     if (optOutValue)
-        [dict setObject:[NSDate date] forKey:kOpenUDIDOOTSKey];
+        [(NSMutableDictionary*)dict setObject:[NSDate date] forKey:kOpenUDIDOOTSKey];
     else
-        [dict removeObjectForKey:kOpenUDIDOOTSKey];
+        [(NSMutableDictionary*)dict removeObjectForKey:kOpenUDIDOOTSKey];
 
   	// store the dictionary locally
     [defaults setObject:dict forKey:kOpenUDIDKey];
